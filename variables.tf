@@ -215,7 +215,7 @@ EOT
       ip_addresses = optional(set(string))
       name         = string
     })
-    backend_http_settings = object({
+    backend_http_settings = list(object({
       affinity_cookie_name = optional(string)
       authentication_certificate = optional(object({
         name = string
@@ -225,25 +225,25 @@ EOT
         enabled           = bool
       }))
       cookie_based_affinity                = string
-      dedicated_backend_connection_enabled = optional(bool, false)
+      dedicated_backend_connection_enabled = optional(bool) # Default: false
       host_name                            = optional(string)
       name                                 = string
       path                                 = optional(string)
-      pick_host_name_from_backend_address  = optional(bool, false)
+      pick_host_name_from_backend_address  = optional(bool) # Default: false
       port                                 = number
       probe_name                           = optional(string)
       protocol                             = string
-      request_timeout                      = optional(number, 30)
+      request_timeout                      = optional(number) # Default: 30
       trusted_root_certificate_names       = optional(list(string))
-    })
-    frontend_ip_configuration = object({
+    }))
+    frontend_ip_configuration = list(object({
       name                            = string
       private_ip_address              = optional(string)
-      private_ip_address_allocation   = optional(string, "Dynamic")
+      private_ip_address_allocation   = optional(string) # Default: "Dynamic"
       private_link_configuration_name = optional(string)
       public_ip_address_id            = optional(string)
       subnet_id                       = optional(string)
-    })
+    }))
     frontend_port = object({
       name = string
       port = number
@@ -268,7 +268,7 @@ EOT
       ssl_certificate_name           = optional(string)
       ssl_profile_name               = optional(string)
     })
-    request_routing_rule = object({
+    request_routing_rule = list(object({
       backend_address_pool_name   = optional(string)
       backend_http_settings_name  = optional(string)
       http_listener_name          = string
@@ -278,7 +278,7 @@ EOT
       rewrite_rule_set_name       = optional(string)
       rule_type                   = string
       url_path_map_name           = optional(string)
-    })
+    }))
     sku = object({
       capacity = optional(number)
       name     = string
@@ -303,7 +303,7 @@ EOT
         policy_type          = optional(string)
       }))
       trusted_client_certificate_names     = optional(list(string))
-      verify_client_cert_issuer_dn         = optional(bool, false)
+      verify_client_cert_issuer_dn         = optional(bool) # Default: false
       verify_client_certificate_revocation = optional(string)
     }))
     ssl_policy = optional(object({
@@ -323,8 +323,8 @@ EOT
       name = string
       rewrite_rule = optional(object({
         condition = optional(object({
-          ignore_case = optional(bool, false)
-          negate      = optional(bool, false)
+          ignore_case = optional(bool) # Default: false
+          negate      = optional(bool) # Default: false
           pattern     = string
           variable    = string
         }))
@@ -342,13 +342,13 @@ EOT
           components   = optional(string)
           path         = optional(string)
           query_string = optional(string)
-          reroute      = optional(bool, false)
+          reroute      = optional(bool) # Default: false
         }))
       }))
     }))
     redirect_configuration = optional(object({
-      include_path         = optional(bool, false)
-      include_query_string = optional(bool, false)
+      include_path         = optional(bool) # Default: false
+      include_query_string = optional(bool) # Default: false
       name                 = string
       redirect_type        = string
       target_listener_name = optional(string)
@@ -359,13 +359,13 @@ EOT
       response_buffering_enabled = bool
     }))
     private_link_configuration = optional(object({
-      ip_configuration = object({
+      ip_configuration = list(object({
         name                          = string
         primary                       = bool
         private_ip_address            = optional(string)
         private_ip_address_allocation = string
         subnet_id                     = string
-      })
+      }))
       name = string
     }))
     identity = optional(object({
@@ -407,10 +407,10 @@ EOT
         body        = optional(string)
         status_code = list(string)
       }))
-      minimum_servers                           = optional(number, 0)
+      minimum_servers                           = optional(number) # Default: 0
       name                                      = string
       path                                      = string
-      pick_host_name_from_backend_http_settings = optional(bool, false)
+      pick_host_name_from_backend_http_settings = optional(bool) # Default: false
       port                                      = optional(number)
       protocol                                  = string
       timeout                                   = number
@@ -427,14 +427,30 @@ EOT
         selector                = optional(string)
         selector_match_operator = optional(string)
       }))
-      file_upload_limit_mb     = optional(number, 100)
+      file_upload_limit_mb     = optional(number) # Default: 100
       firewall_mode            = string
-      max_request_body_size_kb = optional(number, 128)
-      request_body_check       = optional(bool, true)
-      rule_set_type            = optional(string, "OWASP")
+      max_request_body_size_kb = optional(number) # Default: 128
+      request_body_check       = optional(bool)   # Default: true
+      rule_set_type            = optional(string) # Default: "OWASP"
       rule_set_version         = string
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        length(v.backend_http_settings) >= 1
+      )
+    ])
+    error_message = "Each backend_http_settings list must contain at least 1 items"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        length(v.frontend_ip_configuration) >= 1
+      )
+    ])
+    error_message = "Each frontend_ip_configuration list must contain at least 1 items"
+  }
   validation {
     condition = alltrue([
       for k, v in var.application_gateways : (
@@ -442,6 +458,22 @@ EOT
       )
     ])
     error_message = "Each gateway_ip_configuration list must contain at most 2 items"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        length(v.request_routing_rule) >= 1
+      )
+    ])
+    error_message = "Each request_routing_rule list must contain at least 1 items"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        length(v.private_link_configuration.ip_configuration) >= 1
+      )
+    ])
+    error_message = "Each ip_configuration list must contain at least 1 items"
   }
 }
 

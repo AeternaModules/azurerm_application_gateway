@@ -17,41 +17,47 @@ resource "azurerm_application_gateway" "application_gateways" {
     name         = each.value.backend_address_pool.name
   }
 
-  backend_http_settings {
-    affinity_cookie_name = each.value.backend_http_settings.affinity_cookie_name
-    dynamic "authentication_certificate" {
-      for_each = each.value.backend_http_settings.authentication_certificate != null ? [each.value.backend_http_settings.authentication_certificate] : []
-      content {
-        name = authentication_certificate.value.name
+  dynamic "backend_http_settings" {
+    for_each = each.value.backend_http_settings
+    content {
+      affinity_cookie_name = backend_http_settings.value.affinity_cookie_name
+      dynamic "authentication_certificate" {
+        for_each = backend_http_settings.value.authentication_certificate != null ? [backend_http_settings.value.authentication_certificate] : []
+        content {
+          name = authentication_certificate.value.name
+        }
       }
-    }
-    dynamic "connection_draining" {
-      for_each = each.value.backend_http_settings.connection_draining != null ? [each.value.backend_http_settings.connection_draining] : []
-      content {
-        drain_timeout_sec = connection_draining.value.drain_timeout_sec
-        enabled           = connection_draining.value.enabled
+      dynamic "connection_draining" {
+        for_each = backend_http_settings.value.connection_draining != null ? [backend_http_settings.value.connection_draining] : []
+        content {
+          drain_timeout_sec = connection_draining.value.drain_timeout_sec
+          enabled           = connection_draining.value.enabled
+        }
       }
+      cookie_based_affinity                = backend_http_settings.value.cookie_based_affinity
+      dedicated_backend_connection_enabled = backend_http_settings.value.dedicated_backend_connection_enabled
+      host_name                            = backend_http_settings.value.host_name
+      name                                 = backend_http_settings.value.name
+      path                                 = backend_http_settings.value.path
+      pick_host_name_from_backend_address  = backend_http_settings.value.pick_host_name_from_backend_address
+      port                                 = backend_http_settings.value.port
+      probe_name                           = backend_http_settings.value.probe_name
+      protocol                             = backend_http_settings.value.protocol
+      request_timeout                      = backend_http_settings.value.request_timeout
+      trusted_root_certificate_names       = backend_http_settings.value.trusted_root_certificate_names
     }
-    cookie_based_affinity                = each.value.backend_http_settings.cookie_based_affinity
-    dedicated_backend_connection_enabled = each.value.backend_http_settings.dedicated_backend_connection_enabled
-    host_name                            = each.value.backend_http_settings.host_name
-    name                                 = each.value.backend_http_settings.name
-    path                                 = each.value.backend_http_settings.path
-    pick_host_name_from_backend_address  = each.value.backend_http_settings.pick_host_name_from_backend_address
-    port                                 = each.value.backend_http_settings.port
-    probe_name                           = each.value.backend_http_settings.probe_name
-    protocol                             = each.value.backend_http_settings.protocol
-    request_timeout                      = each.value.backend_http_settings.request_timeout
-    trusted_root_certificate_names       = each.value.backend_http_settings.trusted_root_certificate_names
   }
 
-  frontend_ip_configuration {
-    name                            = each.value.frontend_ip_configuration.name
-    private_ip_address              = each.value.frontend_ip_configuration.private_ip_address
-    private_ip_address_allocation   = each.value.frontend_ip_configuration.private_ip_address_allocation
-    private_link_configuration_name = each.value.frontend_ip_configuration.private_link_configuration_name
-    public_ip_address_id            = each.value.frontend_ip_configuration.public_ip_address_id
-    subnet_id                       = each.value.frontend_ip_configuration.subnet_id
+  dynamic "frontend_ip_configuration" {
+    for_each = each.value.frontend_ip_configuration
+    content {
+      name                            = frontend_ip_configuration.value.name
+      private_ip_address              = frontend_ip_configuration.value.private_ip_address
+      private_ip_address_allocation   = frontend_ip_configuration.value.private_ip_address_allocation
+      private_link_configuration_name = frontend_ip_configuration.value.private_link_configuration_name
+      public_ip_address_id            = frontend_ip_configuration.value.public_ip_address_id
+      subnet_id                       = frontend_ip_configuration.value.subnet_id
+    }
   }
 
   frontend_port {
@@ -87,16 +93,19 @@ resource "azurerm_application_gateway" "application_gateways" {
     ssl_profile_name               = each.value.http_listener.ssl_profile_name
   }
 
-  request_routing_rule {
-    backend_address_pool_name   = each.value.request_routing_rule.backend_address_pool_name
-    backend_http_settings_name  = each.value.request_routing_rule.backend_http_settings_name
-    http_listener_name          = each.value.request_routing_rule.http_listener_name
-    name                        = each.value.request_routing_rule.name
-    priority                    = each.value.request_routing_rule.priority
-    redirect_configuration_name = each.value.request_routing_rule.redirect_configuration_name
-    rewrite_rule_set_name       = each.value.request_routing_rule.rewrite_rule_set_name
-    rule_type                   = each.value.request_routing_rule.rule_type
-    url_path_map_name           = each.value.request_routing_rule.url_path_map_name
+  dynamic "request_routing_rule" {
+    for_each = each.value.request_routing_rule
+    content {
+      backend_address_pool_name   = request_routing_rule.value.backend_address_pool_name
+      backend_http_settings_name  = request_routing_rule.value.backend_http_settings_name
+      http_listener_name          = request_routing_rule.value.http_listener_name
+      name                        = request_routing_rule.value.name
+      priority                    = request_routing_rule.value.priority
+      redirect_configuration_name = request_routing_rule.value.redirect_configuration_name
+      rewrite_rule_set_name       = request_routing_rule.value.rewrite_rule_set_name
+      rule_type                   = request_routing_rule.value.rule_type
+      url_path_map_name           = request_routing_rule.value.url_path_map_name
+    }
   }
 
   sku {
@@ -148,12 +157,15 @@ resource "azurerm_application_gateway" "application_gateways" {
   dynamic "private_link_configuration" {
     for_each = each.value.private_link_configuration != null ? [each.value.private_link_configuration] : []
     content {
-      ip_configuration {
-        name                          = private_link_configuration.value.ip_configuration.name
-        primary                       = private_link_configuration.value.ip_configuration.primary
-        private_ip_address            = private_link_configuration.value.ip_configuration.private_ip_address
-        private_ip_address_allocation = private_link_configuration.value.ip_configuration.private_ip_address_allocation
-        subnet_id                     = private_link_configuration.value.ip_configuration.subnet_id
+      dynamic "ip_configuration" {
+        for_each = private_link_configuration.value.ip_configuration
+        content {
+          name                          = ip_configuration.value.name
+          primary                       = ip_configuration.value.primary
+          private_ip_address            = ip_configuration.value.private_ip_address
+          private_ip_address_allocation = ip_configuration.value.private_ip_address_allocation
+          subnet_id                     = ip_configuration.value.subnet_id
+        }
       }
       name = private_link_configuration.value.name
     }
