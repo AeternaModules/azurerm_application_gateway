@@ -1,3 +1,7 @@
+output "application_gateways_id" {
+  description = "Map of id values across all application_gateways, keyed the same as var.application_gateways"
+  value       = { for k, v in azurerm_application_gateway.application_gateways : k => v.id }
+}
 output "application_gateways_authentication_certificate" {
   description = "Map of authentication_certificate values across all application_gateways, keyed the same as var.application_gateways"
   value       = { for k, v in azurerm_application_gateway.application_gateways : k => v.authentication_certificate }
