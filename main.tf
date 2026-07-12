@@ -12,10 +12,13 @@ resource "azurerm_application_gateway" "application_gateways" {
   tags                              = each.value.tags
   zones                             = each.value.zones
 
-  backend_address_pool {
-    fqdns        = each.value.backend_address_pool.fqdns
-    ip_addresses = each.value.backend_address_pool.ip_addresses
-    name         = each.value.backend_address_pool.name
+  dynamic "backend_address_pool" {
+    for_each = each.value.backend_address_pool
+    content {
+      fqdns        = backend_address_pool.value.fqdns
+      ip_addresses = backend_address_pool.value.ip_addresses
+      name         = backend_address_pool.value.name
+    }
   }
 
   dynamic "frontend_ip_configuration" {
@@ -30,9 +33,12 @@ resource "azurerm_application_gateway" "application_gateways" {
     }
   }
 
-  frontend_port {
-    name = each.value.frontend_port.name
-    port = each.value.frontend_port.port
+  dynamic "frontend_port" {
+    for_each = each.value.frontend_port
+    content {
+      name = frontend_port.value.name
+      port = frontend_port.value.port
+    }
   }
 
   dynamic "gateway_ip_configuration" {
@@ -50,7 +56,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "authentication_certificate" {
-    for_each = each.value.authentication_certificate != null ? [each.value.authentication_certificate] : []
+    for_each = each.value.authentication_certificate != null ? each.value.authentication_certificate : []
     content {
       data = authentication_certificate.value.data
       name = authentication_certificate.value.name
@@ -66,7 +72,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "backend" {
-    for_each = each.value.backend != null ? [each.value.backend] : []
+    for_each = each.value.backend != null ? each.value.backend : []
     content {
       client_ip_preservation_enabled = backend.value.client_ip_preservation_enabled
       host_name                      = backend.value.host_name
@@ -84,7 +90,7 @@ resource "azurerm_application_gateway" "application_gateways" {
     content {
       affinity_cookie_name = backend_http_settings.value.affinity_cookie_name
       dynamic "authentication_certificate" {
-        for_each = backend_http_settings.value.authentication_certificate != null ? [backend_http_settings.value.authentication_certificate] : []
+        for_each = backend_http_settings.value.authentication_certificate != null ? backend_http_settings.value.authentication_certificate : []
         content {
           name = authentication_certificate.value.name
         }
@@ -114,7 +120,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "custom_error_configuration" {
-    for_each = each.value.custom_error_configuration != null ? [each.value.custom_error_configuration] : []
+    for_each = each.value.custom_error_configuration != null ? each.value.custom_error_configuration : []
     content {
       custom_error_page_url = custom_error_configuration.value.custom_error_page_url
       status_code           = custom_error_configuration.value.status_code
@@ -130,10 +136,10 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "http_listener" {
-    for_each = each.value.http_listener != null ? [each.value.http_listener] : []
+    for_each = each.value.http_listener != null ? each.value.http_listener : []
     content {
       dynamic "custom_error_configuration" {
-        for_each = http_listener.value.custom_error_configuration != null ? [http_listener.value.custom_error_configuration] : []
+        for_each = http_listener.value.custom_error_configuration != null ? http_listener.value.custom_error_configuration : []
         content {
           custom_error_page_url = custom_error_configuration.value.custom_error_page_url
           status_code           = custom_error_configuration.value.status_code
@@ -161,7 +167,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "listener" {
-    for_each = each.value.listener != null ? [each.value.listener] : []
+    for_each = each.value.listener != null ? each.value.listener : []
     content {
       frontend_ip_configuration_name = listener.value.frontend_ip_configuration_name
       frontend_port_name             = listener.value.frontend_port_name
@@ -174,7 +180,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "private_link_configuration" {
-    for_each = each.value.private_link_configuration != null ? [each.value.private_link_configuration] : []
+    for_each = each.value.private_link_configuration != null ? each.value.private_link_configuration : []
     content {
       dynamic "ip_configuration" {
         for_each = private_link_configuration.value.ip_configuration
@@ -191,7 +197,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "probe" {
-    for_each = each.value.probe != null ? [each.value.probe] : []
+    for_each = each.value.probe != null ? each.value.probe : []
     content {
       host     = probe.value.host
       interval = probe.value.interval
@@ -215,7 +221,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "redirect_configuration" {
-    for_each = each.value.redirect_configuration != null ? [each.value.redirect_configuration] : []
+    for_each = each.value.redirect_configuration != null ? each.value.redirect_configuration : []
     content {
       include_path         = redirect_configuration.value.include_path
       include_query_string = redirect_configuration.value.include_query_string
@@ -242,14 +248,14 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "rewrite_rule_set" {
-    for_each = each.value.rewrite_rule_set != null ? [each.value.rewrite_rule_set] : []
+    for_each = each.value.rewrite_rule_set != null ? each.value.rewrite_rule_set : []
     content {
       name = rewrite_rule_set.value.name
       dynamic "rewrite_rule" {
-        for_each = rewrite_rule_set.value.rewrite_rule != null ? [rewrite_rule_set.value.rewrite_rule] : []
+        for_each = rewrite_rule_set.value.rewrite_rule != null ? rewrite_rule_set.value.rewrite_rule : []
         content {
           dynamic "condition" {
-            for_each = rewrite_rule.value.condition != null ? [rewrite_rule.value.condition] : []
+            for_each = rewrite_rule.value.condition != null ? rewrite_rule.value.condition : []
             content {
               ignore_case = condition.value.ignore_case
               negate      = condition.value.negate
@@ -259,14 +265,14 @@ resource "azurerm_application_gateway" "application_gateways" {
           }
           name = rewrite_rule.value.name
           dynamic "request_header_configuration" {
-            for_each = rewrite_rule.value.request_header_configuration != null ? [rewrite_rule.value.request_header_configuration] : []
+            for_each = rewrite_rule.value.request_header_configuration != null ? rewrite_rule.value.request_header_configuration : []
             content {
               header_name  = request_header_configuration.value.header_name
               header_value = request_header_configuration.value.header_value
             }
           }
           dynamic "response_header_configuration" {
-            for_each = rewrite_rule.value.response_header_configuration != null ? [rewrite_rule.value.response_header_configuration] : []
+            for_each = rewrite_rule.value.response_header_configuration != null ? rewrite_rule.value.response_header_configuration : []
             content {
               header_name  = response_header_configuration.value.header_name
               header_value = response_header_configuration.value.header_value
@@ -288,7 +294,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "routing_rule" {
-    for_each = each.value.routing_rule != null ? [each.value.routing_rule] : []
+    for_each = each.value.routing_rule != null ? each.value.routing_rule : []
     content {
       backend_address_pool_name = routing_rule.value.backend_address_pool_name
       backend_name              = routing_rule.value.backend_name
@@ -299,7 +305,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "ssl_certificate" {
-    for_each = each.value.ssl_certificate != null ? [each.value.ssl_certificate] : []
+    for_each = each.value.ssl_certificate != null ? each.value.ssl_certificate : []
     content {
       data                = ssl_certificate.value.data
       key_vault_secret_id = ssl_certificate.value.key_vault_secret_id
@@ -320,7 +326,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "ssl_profile" {
-    for_each = each.value.ssl_profile != null ? [each.value.ssl_profile] : []
+    for_each = each.value.ssl_profile != null ? each.value.ssl_profile : []
     content {
       name = ssl_profile.value.name
       dynamic "ssl_policy" {
@@ -341,7 +347,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "trusted_client_certificate" {
-    for_each = each.value.trusted_client_certificate != null ? [each.value.trusted_client_certificate] : []
+    for_each = each.value.trusted_client_certificate != null ? each.value.trusted_client_certificate : []
     content {
       data = trusted_client_certificate.value.data
       name = trusted_client_certificate.value.name
@@ -349,7 +355,7 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "trusted_root_certificate" {
-    for_each = each.value.trusted_root_certificate != null ? [each.value.trusted_root_certificate] : []
+    for_each = each.value.trusted_root_certificate != null ? each.value.trusted_root_certificate : []
     content {
       data                = trusted_root_certificate.value.data
       key_vault_secret_id = trusted_root_certificate.value.key_vault_secret_id
@@ -358,21 +364,24 @@ resource "azurerm_application_gateway" "application_gateways" {
   }
 
   dynamic "url_path_map" {
-    for_each = each.value.url_path_map != null ? [each.value.url_path_map] : []
+    for_each = each.value.url_path_map != null ? each.value.url_path_map : []
     content {
       default_backend_address_pool_name   = url_path_map.value.default_backend_address_pool_name
       default_backend_http_settings_name  = url_path_map.value.default_backend_http_settings_name
       default_redirect_configuration_name = url_path_map.value.default_redirect_configuration_name
       default_rewrite_rule_set_name       = url_path_map.value.default_rewrite_rule_set_name
       name                                = url_path_map.value.name
-      path_rule {
-        backend_address_pool_name   = url_path_map.value.path_rule.backend_address_pool_name
-        backend_http_settings_name  = url_path_map.value.path_rule.backend_http_settings_name
-        firewall_policy_id          = url_path_map.value.path_rule.firewall_policy_id
-        name                        = url_path_map.value.path_rule.name
-        paths                       = url_path_map.value.path_rule.paths
-        redirect_configuration_name = url_path_map.value.path_rule.redirect_configuration_name
-        rewrite_rule_set_name       = url_path_map.value.path_rule.rewrite_rule_set_name
+      dynamic "path_rule" {
+        for_each = url_path_map.value.path_rule
+        content {
+          backend_address_pool_name   = path_rule.value.backend_address_pool_name
+          backend_http_settings_name  = path_rule.value.backend_http_settings_name
+          firewall_policy_id          = path_rule.value.firewall_policy_id
+          name                        = path_rule.value.name
+          paths                       = path_rule.value.paths
+          redirect_configuration_name = path_rule.value.redirect_configuration_name
+          rewrite_rule_set_name       = path_rule.value.rewrite_rule_set_name
+        }
       }
     }
   }
@@ -381,7 +390,7 @@ resource "azurerm_application_gateway" "application_gateways" {
     for_each = each.value.waf_configuration != null ? [each.value.waf_configuration] : []
     content {
       dynamic "disabled_rule_group" {
-        for_each = waf_configuration.value.disabled_rule_group != null ? [waf_configuration.value.disabled_rule_group] : []
+        for_each = waf_configuration.value.disabled_rule_group != null ? waf_configuration.value.disabled_rule_group : []
         content {
           rule_group_name = disabled_rule_group.value.rule_group_name
           rules           = disabled_rule_group.value.rules
@@ -389,7 +398,7 @@ resource "azurerm_application_gateway" "application_gateways" {
       }
       enabled = waf_configuration.value.enabled
       dynamic "exclusion" {
-        for_each = waf_configuration.value.exclusion != null ? [waf_configuration.value.exclusion] : []
+        for_each = waf_configuration.value.exclusion != null ? waf_configuration.value.exclusion : []
         content {
           match_variable          = exclusion.value.match_variable
           selector                = exclusion.value.selector

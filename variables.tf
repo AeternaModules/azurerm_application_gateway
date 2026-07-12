@@ -240,11 +240,11 @@ EOT
     http2_enabled                     = optional(bool)
     tags                              = optional(map(string))
     zones                             = optional(set(string))
-    backend_address_pool = object({
+    backend_address_pool = list(object({
       fqdns        = optional(set(string))
       ip_addresses = optional(set(string))
       name         = string
-    })
+    }))
     frontend_ip_configuration = list(object({
       name                            = string
       private_ip_address              = optional(string)
@@ -253,10 +253,10 @@ EOT
       public_ip_address_id            = optional(string)
       subnet_id                       = optional(string)
     }))
-    frontend_port = object({
+    frontend_port = list(object({
       name = string
       port = number
-    })
+    }))
     gateway_ip_configuration = list(object({
       name      = string
       subnet_id = string
@@ -266,16 +266,16 @@ EOT
       name     = string
       tier     = string
     })
-    trusted_root_certificate = optional(object({
+    trusted_root_certificate = optional(list(object({
       data                = optional(string)
       key_vault_secret_id = optional(string)
       name                = string
-    }))
-    trusted_client_certificate = optional(object({
+    })))
+    trusted_client_certificate = optional(list(object({
       data = string
       name = string
-    }))
-    ssl_profile = optional(object({
+    })))
+    ssl_profile = optional(list(object({
       name = string
       ssl_policy = optional(object({
         cipher_suites        = optional(list(string))
@@ -288,7 +288,7 @@ EOT
       verify_client_cert_issuer_dn         = optional(bool)
       verify_client_certificate_issuer_dn  = optional(bool)
       verify_client_certificate_revocation = optional(string)
-    }))
+    })))
     ssl_policy = optional(object({
       cipher_suites        = optional(list(string))
       disabled_protocols   = optional(list(string))
@@ -296,37 +296,37 @@ EOT
       policy_name          = optional(string)
       policy_type          = optional(string)
     }))
-    ssl_certificate = optional(object({
+    ssl_certificate = optional(list(object({
       data                = optional(string)
       key_vault_secret_id = optional(string)
       name                = string
       password            = optional(string)
-    }))
-    routing_rule = optional(object({
+    })))
+    routing_rule = optional(list(object({
       backend_address_pool_name = string
       backend_name              = string
       listener_name             = string
       name                      = string
       priority                  = number
-    }))
-    rewrite_rule_set = optional(object({
+    })))
+    rewrite_rule_set = optional(list(object({
       name = string
-      rewrite_rule = optional(object({
-        condition = optional(object({
+      rewrite_rule = optional(list(object({
+        condition = optional(list(object({
           ignore_case = optional(bool) # Default: false
           negate      = optional(bool) # Default: false
           pattern     = string
           variable    = string
-        }))
+        })))
         name = string
-        request_header_configuration = optional(object({
+        request_header_configuration = optional(list(object({
           header_name  = string
           header_value = string
-        }))
-        response_header_configuration = optional(object({
+        })))
+        response_header_configuration = optional(list(object({
           header_name  = string
           header_value = string
-        }))
+        })))
         rule_sequence = number
         url = optional(object({
           components   = optional(string)
@@ -334,8 +334,8 @@ EOT
           query_string = optional(string)
           reroute      = optional(bool) # Default: false
         }))
-      }))
-    }))
+      })))
+    })))
     request_routing_rule = optional(list(object({
       backend_address_pool_name   = optional(string)
       backend_http_settings_name  = optional(string)
@@ -347,15 +347,15 @@ EOT
       rule_type                   = string
       url_path_map_name           = optional(string)
     })))
-    redirect_configuration = optional(object({
+    redirect_configuration = optional(list(object({
       include_path         = optional(bool) # Default: false
       include_query_string = optional(bool) # Default: false
       name                 = string
       redirect_type        = string
       target_listener_name = optional(string)
       target_url           = optional(string)
-    }))
-    probe = optional(object({
+    })))
+    probe = optional(list(object({
       host     = optional(string)
       interval = number
       match = optional(object({
@@ -371,8 +371,8 @@ EOT
       proxy_protocol_header_enabled             = optional(bool) # Default: false
       timeout                                   = number
       unhealthy_threshold                       = number
-    }))
-    listener = optional(object({
+    })))
+    listener = optional(list(object({
       frontend_ip_configuration_name = string
       frontend_port_name             = string
       host_names                     = optional(set(string))
@@ -380,14 +380,14 @@ EOT
       protocol                       = string
       ssl_certificate_name           = optional(string)
       ssl_profile_name               = optional(string)
-    }))
-    url_path_map = optional(object({
+    })))
+    url_path_map = optional(list(object({
       default_backend_address_pool_name   = optional(string)
       default_backend_http_settings_name  = optional(string)
       default_redirect_configuration_name = optional(string)
       default_rewrite_rule_set_name       = optional(string)
       name                                = string
-      path_rule = object({
+      path_rule = list(object({
         backend_address_pool_name   = optional(string)
         backend_http_settings_name  = optional(string)
         firewall_policy_id          = optional(string)
@@ -395,17 +395,17 @@ EOT
         paths                       = list(string)
         redirect_configuration_name = optional(string)
         rewrite_rule_set_name       = optional(string)
-      })
-    }))
+      }))
+    })))
     identity = optional(object({
       identity_ids = optional(set(string))
       type         = string
     }))
-    http_listener = optional(object({
-      custom_error_configuration = optional(object({
+    http_listener = optional(list(object({
+      custom_error_configuration = optional(list(object({
         custom_error_page_url = string
         status_code           = string
-      }))
+      })))
       firewall_policy_id             = optional(string)
       frontend_ip_configuration_name = string
       frontend_port_name             = string
@@ -416,20 +416,20 @@ EOT
       require_sni                    = optional(bool)
       ssl_certificate_name           = optional(string)
       ssl_profile_name               = optional(string)
-    }))
+    })))
     global = optional(object({
       request_buffering_enabled  = bool
       response_buffering_enabled = bool
     }))
-    custom_error_configuration = optional(object({
+    custom_error_configuration = optional(list(object({
       custom_error_page_url = string
       status_code           = string
-    }))
+    })))
     backend_http_settings = optional(list(object({
       affinity_cookie_name = optional(string)
-      authentication_certificate = optional(object({
+      authentication_certificate = optional(list(object({
         name = string
-      }))
+      })))
       certificate_chain_validation_enabled = optional(bool) # Default: true
       connection_draining = optional(object({
         drain_timeout_sec = number
@@ -449,7 +449,7 @@ EOT
       sni_validation_enabled               = optional(bool) # Default: true
       trusted_root_certificate_names       = optional(list(string))
     })))
-    backend = optional(object({
+    backend = optional(list(object({
       client_ip_preservation_enabled = optional(bool) # Default: false
       host_name                      = optional(string)
       name                           = string
@@ -458,16 +458,16 @@ EOT
       protocol                       = string
       timeout_in_seconds             = optional(number) # Default: 30
       trusted_root_certificate_names = optional(list(string))
-    }))
+    })))
     autoscale_configuration = optional(object({
       max_capacity = optional(number)
       min_capacity = number
     }))
-    authentication_certificate = optional(object({
+    authentication_certificate = optional(list(object({
       data = string
       name = string
-    }))
-    private_link_configuration = optional(object({
+    })))
+    private_link_configuration = optional(list(object({
       ip_configuration = list(object({
         name                          = string
         primary                       = bool
@@ -476,18 +476,18 @@ EOT
         subnet_id                     = string
       }))
       name = string
-    }))
+    })))
     waf_configuration = optional(object({
-      disabled_rule_group = optional(object({
+      disabled_rule_group = optional(list(object({
         rule_group_name = string
         rules           = optional(list(number))
-      }))
+      })))
       enabled = bool
-      exclusion = optional(object({
+      exclusion = optional(list(object({
         match_variable          = string
         selector                = optional(string)
         selector_match_operator = optional(string)
-      }))
+      })))
       file_upload_limit_mb     = optional(number) # Default: 100
       firewall_mode            = string
       max_request_body_size_kb = optional(number) # Default: 128
@@ -523,7 +523,7 @@ EOT
   validation {
     condition = alltrue([
       for k, v in var.application_gateways : (
-        length(v.private_link_configuration.ip_configuration) >= 1
+        v.private_link_configuration == null || alltrue([for item in v.private_link_configuration : (length(item.ip_configuration) >= 1)])
       )
     ])
     error_message = "Each ip_configuration list must contain at least 1 items"
@@ -536,276 +536,15 @@ EOT
     ])
     error_message = "Each request_routing_rule list must contain at least 1 items"
   }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.zones == null || (length(v.zones) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.backend == null || (v.backend.host_name == null || (length(v.backend.host_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.backend == null || (v.backend.timeout_in_seconds == null || (v.backend.timeout_in_seconds >= 1 && v.backend.timeout_in_seconds <= 86400))
-      )
-    ])
-    error_message = "must be between 1 and 86400"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.http_listener == null || (v.http_listener.host_names == null || (length(v.http_listener.host_names) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.listener == null || (v.listener.host_names == null || (length(v.listener.host_names) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.private_link_configuration == null || (length(v.private_link_configuration.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.routing_rule == null || (v.routing_rule.priority >= 1 && v.routing_rule.priority <= 20000)
-      )
-    ])
-    error_message = "must be between 1 and 20000"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.redirect_configuration == null || (length(v.redirect_configuration.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.redirect_configuration == null || (v.redirect_configuration.target_listener_name == null || (length(v.redirect_configuration.target_listener_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.redirect_configuration == null || (v.redirect_configuration.target_url == null || (length(v.redirect_configuration.target_url) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.autoscale_configuration == null || (v.autoscale_configuration.min_capacity >= 0 && v.autoscale_configuration.min_capacity <= 100)
-      )
-    ])
-    error_message = "must be between 0 and 100"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.autoscale_configuration == null || (v.autoscale_configuration.max_capacity == null || (v.autoscale_configuration.max_capacity >= 2 && v.autoscale_configuration.max_capacity <= 125))
-      )
-    ])
-    error_message = "must be between 2 and 125"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.authentication_certificate == null || (length(v.authentication_certificate.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.authentication_certificate == null || (length(v.authentication_certificate.data) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.trusted_root_certificate == null || (length(v.trusted_root_certificate.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.trusted_root_certificate == null || (v.trusted_root_certificate.data == null || (length(v.trusted_root_certificate.data) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.probe == null || (v.probe.interval >= 1 && v.probe.interval <= 86400)
-      )
-    ])
-    error_message = "must be between 1 and 86400"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.probe == null || (v.probe.timeout >= 1 && v.probe.timeout <= 86400)
-      )
-    ])
-    error_message = "must be between 1 and 86400"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.probe == null || (v.probe.unhealthy_threshold >= 1 && v.probe.unhealthy_threshold <= 20)
-      )
-    ])
-    error_message = "must be between 1 and 20"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.probe == null || (v.probe.host == null || (length(v.probe.host) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.rewrite_rule_set == null || (length(v.rewrite_rule_set.name) > 0)
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.rewrite_rule_set == null || (v.rewrite_rule_set.rewrite_rule == null || (length(v.rewrite_rule_set.rewrite_rule.name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.rewrite_rule_set == null || (v.rewrite_rule_set.rewrite_rule == null || (v.rewrite_rule_set.rewrite_rule.rule_sequence >= 1 && v.rewrite_rule_set.rewrite_rule.rule_sequence <= 1000))
-      )
-    ])
-    error_message = "must be between 1 and 1000"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.rewrite_rule_set == null || (v.rewrite_rule_set.rewrite_rule == null || (v.rewrite_rule_set.rewrite_rule.url == null || (v.rewrite_rule_set.rewrite_rule.url.components == null || (contains(["path_only", "query_string_only"], v.rewrite_rule_set.rewrite_rule.url.components)))))
-      )
-    ])
-    error_message = "must be one of: path_only, query_string_only"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.ssl_profile == null || (v.ssl_profile.trusted_client_certificate_names == null || (length(v.ssl_profile.trusted_client_certificate_names) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.url_path_map == null || (v.url_path_map.default_redirect_configuration_name == null || (length(v.url_path_map.default_redirect_configuration_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.url_path_map == null || (v.url_path_map.default_rewrite_rule_set_name == null || (length(v.url_path_map.default_rewrite_rule_set_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.url_path_map == null || (v.url_path_map.path_rule.redirect_configuration_name == null || (length(v.url_path_map.path_rule.redirect_configuration_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.url_path_map == null || (v.url_path_map.path_rule.rewrite_rule_set_name == null || (length(v.url_path_map.path_rule.rewrite_rule_set_name) > 0))
-      )
-    ])
-    error_message = "must not be empty"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.waf_configuration == null || (v.waf_configuration.file_upload_limit_mb == null || (v.waf_configuration.file_upload_limit_mb >= 1 && v.waf_configuration.file_upload_limit_mb <= 750))
-      )
-    ])
-    error_message = "must be between 1 and 750"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.waf_configuration == null || (v.waf_configuration.max_request_body_size_kb == null || (v.waf_configuration.max_request_body_size_kb >= 1 && v.waf_configuration.max_request_body_size_kb <= 128))
-      )
-    ])
-    error_message = "must be between 1 and 128"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.waf_configuration == null || (v.waf_configuration.disabled_rule_group == null || (v.waf_configuration.disabled_rule_group.rules == null || (v.waf_configuration.disabled_rule_group.rules >= 1)))
-      )
-    ])
-    error_message = "must be at least 1"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.application_gateways : (
-        v.waf_configuration == null || (v.waf_configuration.exclusion == null || (v.waf_configuration.exclusion.selector == null || (length(v.waf_configuration.exclusion.selector) > 0)))
-      )
-    ])
-    error_message = "must not be empty"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_application_gateway's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
   # path: location
   #   source:    location.EnhancedValidate: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
+  # path: zones[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: resource_group_name
   #   condition: length(value) <= 90
   #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
@@ -866,10 +605,16 @@ EOT
   #   source:    validate.PortNumber: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
   # path: backend.protocol
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: backend.host_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: backend.probe_name
   #   source:    [from networkValidate.ApplicationGatewayName] !ok
   # path: backend.probe_name
   #   source:    [from networkValidate.ApplicationGatewayName] !matched
+  # path: backend.timeout_in_seconds
+  #   condition: value >= 1 && value <= 86400
+  #   message:   must be between 1 and 86400
   # path: backend.trusted_root_certificate_names[*]
   #   source:    [from networkValidate.ApplicationGatewayName] !ok
   # path: backend.trusted_root_certificate_names[*]
@@ -884,6 +629,9 @@ EOT
   #   source:    [from commonids.ValidateSubnetID] err != nil
   # path: http_listener.protocol
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: http_listener.host_names[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: http_listener.custom_error_configuration.status_code
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: http_listener.firewall_policy_id
@@ -904,6 +652,9 @@ EOT
   #   source:    [from networkValidate.ApplicationGatewayName] !matched
   # path: listener.protocol
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: listener.host_names[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: listener.ssl_certificate_name
   #   source:    [from networkValidate.ApplicationGatewayName] !ok
   # path: listener.ssl_certificate_name
@@ -912,6 +663,9 @@ EOT
   #   source:    [from networkValidate.ApplicationGatewayName] !ok
   # path: listener.ssl_profile_name
   #   source:    [from networkValidate.ApplicationGatewayName] !matched
+  # path: private_link_configuration.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: private_link_configuration.ip_configuration.name
   #   condition: length(value) > 0
   #   message:   must not be empty
@@ -948,34 +702,103 @@ EOT
   #   source:    [from networkValidate.ApplicationGatewayName] !ok
   # path: routing_rule.listener_name
   #   source:    [from networkValidate.ApplicationGatewayName] !matched
+  # path: routing_rule.priority
+  #   condition: value >= 1 && value <= 20000
+  #   message:   must be between 1 and 20000
+  # path: redirect_configuration.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: redirect_configuration.redirect_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: redirect_configuration.target_listener_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: redirect_configuration.target_url
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: autoscale_configuration.min_capacity
+  #   condition: value >= 0 && value <= 100
+  #   message:   must be between 0 and 100
+  # path: autoscale_configuration.max_capacity
+  #   condition: value >= 2 && value <= 125
+  #   message:   must be between 2 and 125
   # path: sku.name
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: sku.tier
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: authentication_certificate.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: authentication_certificate.data
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: trusted_root_certificate.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: trusted_root_certificate.data
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: trusted_root_certificate.key_vault_secret_id
   #   source:    [from keyvault.ValidateNestedItemID] !ok
   # path: trusted_root_certificate.key_vault_secret_id
   #   source:    [from keyvault.ValidateNestedItemID] err != nil
+  # path: probe.interval
+  #   condition: value >= 1 && value <= 86400
+  #   message:   must be between 1 and 86400
   # path: probe.name
   #   source:    [from networkValidate.ApplicationGatewayName] !ok
   # path: probe.name
   #   source:    [from networkValidate.ApplicationGatewayName] !matched
   # path: probe.protocol
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: probe.timeout
+  #   condition: value >= 1 && value <= 86400
+  #   message:   must be between 1 and 86400
+  # path: probe.unhealthy_threshold
+  #   condition: value >= 1 && value <= 20
+  #   message:   must be between 1 and 20
+  # path: probe.host
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: probe.path
   #   source:    validation.StringStartsWithOneOf(...) - no translation rule yet, add one
   # path: probe.port
   #   source:    validate.PortNumber: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
+  # path: rewrite_rule_set.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: rewrite_rule_set.rewrite_rule.name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: rewrite_rule_set.rewrite_rule.rule_sequence
+  #   condition: value >= 1 && value <= 1000
+  #   message:   must be between 1 and 1000
+  # path: rewrite_rule_set.rewrite_rule.url.components
+  #   condition: contains(["path_only", "query_string_only"], value)
+  #   message:   must be one of: path_only, query_string_only
   # path: ssl_certificate.data
   #   source:    validation.StringIsBase64(...) - no translation rule yet, add one
   # path: ssl_certificate.key_vault_secret_id
   #   source:    [from keyvault.ValidateNestedItemID] !ok
   # path: ssl_certificate.key_vault_secret_id
   #   source:    [from keyvault.ValidateNestedItemID] err != nil
+  # path: ssl_profile.trusted_client_certificate_names[*]
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: ssl_profile.verify_client_certificate_revocation
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: url_path_map.default_redirect_configuration_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: url_path_map.default_rewrite_rule_set_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: url_path_map.path_rule.redirect_configuration_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
+  # path: url_path_map.path_rule.rewrite_rule_set_name
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: url_path_map.path_rule.firewall_policy_id
   #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] !ok
   # path: url_path_map.path_rule.firewall_policy_id
@@ -986,12 +809,24 @@ EOT
   #   source:    networkValidate.ValidateWebApplicationFirewallPolicyRuleSetType (unresolved: func ValidateWebApplicationFirewallPolicyRuleSetType not found in /home/dan/code/public/terraform-provider-azurerm/internal/services/network/validate)
   # path: waf_configuration.rule_set_version
   #   source:    networkValidate.ValidateWebApplicationFirewallPolicyRuleSetVersion (unresolved: func ValidateWebApplicationFirewallPolicyRuleSetVersion not found in /home/dan/code/public/terraform-provider-azurerm/internal/services/network/validate)
+  # path: waf_configuration.file_upload_limit_mb
+  #   condition: value >= 1 && value <= 750
+  #   message:   must be between 1 and 750
+  # path: waf_configuration.max_request_body_size_kb
+  #   condition: value >= 1 && value <= 128
+  #   message:   must be between 1 and 128
   # path: waf_configuration.disabled_rule_group.rule_group_name
   #   source:    networkValidate.ValidateWebApplicationFirewallPolicyRuleGroupName (unresolved: func ValidateWebApplicationFirewallPolicyRuleGroupName not found in /home/dan/code/public/terraform-provider-azurerm/internal/services/network/validate)
+  # path: waf_configuration.disabled_rule_group.rules[*]
+  #   condition: value >= 1
+  #   message:   must be at least 1
   # path: waf_configuration.exclusion.match_variable
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: waf_configuration.exclusion.selector_match_operator
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: waf_configuration.exclusion.selector
+  #   condition: length(value) > 0
+  #   message:   must not be empty
   # path: firewall_policy_id
   #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] !ok
   # path: firewall_policy_id
