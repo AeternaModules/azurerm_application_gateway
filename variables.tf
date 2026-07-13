@@ -544,332 +544,406 @@ EOT
     ])
     error_message = "Each path_rule list must contain at least 1 items"
   }
-  # --- Unconfirmed validation candidates, derived from azurerm_application_gateway's provider source ---
-  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
-  # or a path that crosses a list-typed block (needs its own for_each wrapping).
-  # Review, translate into a real validation{} block above, and delete once confirmed.
-  # path: location
-  #   source:    location.EnhancedValidate: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: zones[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: resource_group_name
-  #   condition: length(value) <= 90
-  #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
-  #   source:    [from resourcegroups.ValidateName: invalid when len(value) > 90]
-  # path: resource_group_name
-  #   condition: !endswith(value, ".")
-  #   message:   [from resourcegroups.ValidateName: must not end with "."]
-  #   source:    [from resourcegroups.ValidateName: must not end with "."]
-  # path: resource_group_name
-  #   condition: length(value) != 0
-  #   message:   [from resourcegroups.ValidateName: invalid when len(value) == 0]
-  #   source:    [from resourcegroups.ValidateName: invalid when len(value) == 0]
-  # path: resource_group_name
-  #   source:    [from resourcegroups.ValidateName] !matched
-  # path: identity.type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: identity.identity_ids[*]
-  #   source:    [from commonids.ValidateUserAssignedIdentityID] !ok
-  # path: identity.identity_ids[*]
-  #   source:    [from commonids.ValidateUserAssignedIdentityID] err != nil
-  # path: backend_address_pool.fqdns[*]
-  #   source:    validation.NoZeroValues(...) - no translation rule yet, add one
-  # path: backend_address_pool.ip_addresses[*]
-  #   source:    [from validate.IPv4Address] !ok
-  # path: backend_address_pool.ip_addresses[*]
-  #   source:    [from validate.IPv4Address] four == nil
-  # path: backend_http_settings.cookie_based_affinity
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: backend_http_settings.port
-  #   source:    validate.PortNumber: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: backend_http_settings.protocol
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: backend_http_settings.affinity_cookie_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: backend_http_settings.connection_draining.drain_timeout_sec
-  #   condition: value >= 1 && value <= 3600
-  #   message:   must be between 1 and 3600
-  # path: backend_http_settings.host_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: backend_http_settings.path
-  #   source:    validation.StringStartsWithOneOf(...) - no translation rule yet, add one
-  # path: backend_http_settings.request_timeout
-  #   condition: value >= 1 && value <= 86400
-  #   message:   must be between 1 and 86400
-  # path: backend_http_settings.sni_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: backend_http_settings.trusted_root_certificate_names[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: backend.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: backend.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: backend.port
-  #   source:    validate.PortNumber: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: backend.protocol
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: backend.host_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: backend.probe_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: backend.probe_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: backend.timeout_in_seconds
-  #   condition: value >= 1 && value <= 86400
-  #   message:   must be between 1 and 86400
-  # path: backend.trusted_root_certificate_names[*]
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: backend.trusted_root_certificate_names[*]
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: frontend_ip_configuration.private_ip_address_allocation
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: frontend_port.port
-  #   source:    validate.PortNumber: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: gateway_ip_configuration.subnet_id
-  #   source:    [from commonids.ValidateSubnetID] !ok
-  # path: gateway_ip_configuration.subnet_id
-  #   source:    [from commonids.ValidateSubnetID] err != nil
-  # path: http_listener.protocol
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: http_listener.host_names[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: http_listener.custom_error_configuration.status_code
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: http_listener.firewall_policy_id
-  #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] !ok
-  # path: http_listener.firewall_policy_id
-  #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] err != nil
-  # path: listener.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: listener.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: listener.frontend_ip_configuration_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: listener.frontend_ip_configuration_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: listener.frontend_port_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: listener.frontend_port_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: listener.protocol
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: listener.host_names[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: listener.ssl_certificate_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: listener.ssl_certificate_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: listener.ssl_profile_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: listener.ssl_profile_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: private_link_configuration.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: private_link_configuration.ip_configuration.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: private_link_configuration.ip_configuration.subnet_id
-  #   source:    [from commonids.ValidateSubnetID] !ok
-  # path: private_link_configuration.ip_configuration.subnet_id
-  #   source:    [from commonids.ValidateSubnetID] err != nil
-  # path: private_link_configuration.ip_configuration.private_ip_address_allocation
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: request_routing_rule.rule_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: request_routing_rule.redirect_configuration_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: request_routing_rule.rewrite_rule_set_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: request_routing_rule.priority
-  #   condition: value >= 1 && value <= 20000
-  #   message:   must be between 1 and 20000
-  # path: routing_rule.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: routing_rule.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: routing_rule.backend_address_pool_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: routing_rule.backend_address_pool_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: routing_rule.backend_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: routing_rule.backend_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: routing_rule.listener_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: routing_rule.listener_name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: routing_rule.priority
-  #   condition: value >= 1 && value <= 20000
-  #   message:   must be between 1 and 20000
-  # path: redirect_configuration.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: redirect_configuration.redirect_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: redirect_configuration.target_listener_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: redirect_configuration.target_url
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: autoscale_configuration.min_capacity
-  #   condition: value >= 0 && value <= 100
-  #   message:   must be between 0 and 100
-  # path: autoscale_configuration.max_capacity
-  #   condition: value >= 2 && value <= 125
-  #   message:   must be between 2 and 125
-  # path: sku.name
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: sku.tier
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: authentication_certificate.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: authentication_certificate.data
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: trusted_root_certificate.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: trusted_root_certificate.data
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: trusted_root_certificate.key_vault_secret_id
-  #   source:    [from keyvault.ValidateNestedItemID] !ok
-  # path: trusted_root_certificate.key_vault_secret_id
-  #   source:    [from keyvault.ValidateNestedItemID] err != nil
-  # path: ssl_policy.disabled_protocols[*]
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: ssl_policy.policy_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: ssl_policy.cipher_suites[*]
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: ssl_policy.min_protocol_version
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: probe.interval
-  #   condition: value >= 1 && value <= 86400
-  #   message:   must be between 1 and 86400
-  # path: probe.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !ok
-  # path: probe.name
-  #   source:    [from networkValidate.ApplicationGatewayName] !matched
-  # path: probe.protocol
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: probe.timeout
-  #   condition: value >= 1 && value <= 86400
-  #   message:   must be between 1 and 86400
-  # path: probe.unhealthy_threshold
-  #   condition: value >= 1 && value <= 20
-  #   message:   must be between 1 and 20
-  # path: probe.host
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: probe.path
-  #   source:    validation.StringStartsWithOneOf(...) - no translation rule yet, add one
-  # path: probe.port
-  #   source:    validate.PortNumber: no recognizable `if ... { errors = append(...) }` pattern - read it by hand
-  # path: rewrite_rule_set.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: rewrite_rule_set.rewrite_rule.name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: rewrite_rule_set.rewrite_rule.rule_sequence
-  #   condition: value >= 1 && value <= 1000
-  #   message:   must be between 1 and 1000
-  # path: rewrite_rule_set.rewrite_rule.url.components
-  #   condition: contains(["path_only", "query_string_only"], value)
-  #   message:   must be one of: path_only, query_string_only
-  # path: ssl_certificate.data
-  #   source:    validation.StringIsBase64(...) - no translation rule yet, add one
-  # path: ssl_certificate.key_vault_secret_id
-  #   source:    [from keyvault.ValidateNestedItemID] !ok
-  # path: ssl_certificate.key_vault_secret_id
-  #   source:    [from keyvault.ValidateNestedItemID] err != nil
-  # path: ssl_profile.trusted_client_certificate_names[*]
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: ssl_profile.verify_client_certificate_revocation
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: ssl_profile.ssl_policy.disabled_protocols[*]
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: ssl_profile.ssl_policy.policy_type
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: ssl_profile.ssl_policy.cipher_suites[*]
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: ssl_profile.ssl_policy.min_protocol_version
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: url_path_map.default_redirect_configuration_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: url_path_map.default_rewrite_rule_set_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: url_path_map.path_rule.redirect_configuration_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: url_path_map.path_rule.rewrite_rule_set_name
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: url_path_map.path_rule.firewall_policy_id
-  #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] !ok
-  # path: url_path_map.path_rule.firewall_policy_id
-  #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] err != nil
-  # path: waf_configuration.firewall_mode
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: waf_configuration.rule_set_type
-  #   source:    networkValidate.ValidateWebApplicationFirewallPolicyRuleSetType (unresolved: func ValidateWebApplicationFirewallPolicyRuleSetType not found in /home/dan/code/public/terraform-provider-azurerm/internal/services/network/validate)
-  # path: waf_configuration.rule_set_version
-  #   source:    networkValidate.ValidateWebApplicationFirewallPolicyRuleSetVersion (unresolved: func ValidateWebApplicationFirewallPolicyRuleSetVersion not found in /home/dan/code/public/terraform-provider-azurerm/internal/services/network/validate)
-  # path: waf_configuration.file_upload_limit_mb
-  #   condition: value >= 1 && value <= 750
-  #   message:   must be between 1 and 750
-  # path: waf_configuration.max_request_body_size_kb
-  #   condition: value >= 1 && value <= 128
-  #   message:   must be between 1 and 128
-  # path: waf_configuration.disabled_rule_group.rule_group_name
-  #   source:    networkValidate.ValidateWebApplicationFirewallPolicyRuleGroupName (unresolved: func ValidateWebApplicationFirewallPolicyRuleGroupName not found in /home/dan/code/public/terraform-provider-azurerm/internal/services/network/validate)
-  # path: waf_configuration.disabled_rule_group.rules[*]
-  #   condition: value >= 1
-  #   message:   must be at least 1
-  # path: waf_configuration.exclusion.match_variable
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: waf_configuration.exclusion.selector_match_operator
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: waf_configuration.exclusion.selector
-  #   condition: length(value) > 0
-  #   message:   must not be empty
-  # path: firewall_policy_id
-  #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] !ok
-  # path: firewall_policy_id
-  #   source:    [from webapplicationfirewallpolicies.ValidateApplicationGatewayWebApplicationFirewallPolicyID] err != nil
-  # path: custom_error_configuration.status_code
-  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
-  # path: tags
-  #   condition: length(value) <= 50
-  #   message:   [from tags.Validate: invalid when len(value) > 50]
-  #   source:    [from tags.Validate: invalid when len(value) > 50]
-  # path: tags
-  #   condition: length(value) <= 512
-  #   message:   [from tags.Validate: invalid when len(value) > 512]
-  #   source:    [from tags.Validate: invalid when len(value) > 512]
-  # path: tags
-  #   source:    [from tags.Validate] err != nil
-  # path: tags
-  #   condition: length(value) <= 256
-  #   message:   [from tags.Validate: invalid when len(value) > 256]
-  #   source:    [from tags.Validate: invalid when len(value) > 256]
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.zones == null || (alltrue([for x in v.zones : length(x) > 0]))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        length(v.resource_group_name) <= 90
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: invalid when len(value) > 90]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        !endswith(v.resource_group_name, ".")
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: must not end with \".\"]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        length(v.resource_group_name) != 0
+      )
+    ])
+    error_message = "[from resourcegroups.ValidateName: invalid when len(value) == 0]"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend_http_settings == null || alltrue([for item in v.backend_http_settings : (item.affinity_cookie_name == null || (length(item.affinity_cookie_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend_http_settings == null || alltrue([for item in v.backend_http_settings : (item.connection_draining == null || (item.connection_draining.drain_timeout_sec >= 1 && item.connection_draining.drain_timeout_sec <= 3600))])
+      )
+    ])
+    error_message = "must be between 1 and 3600"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend_http_settings == null || alltrue([for item in v.backend_http_settings : (item.host_name == null || (length(item.host_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend_http_settings == null || alltrue([for item in v.backend_http_settings : (item.path == null || (anytrue([for p in ["/"] : startswith(item.path, p)])))])
+      )
+    ])
+    error_message = "must start with one of the allowed prefixes"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend_http_settings == null || alltrue([for item in v.backend_http_settings : (item.request_timeout == null || (item.request_timeout >= 1 && item.request_timeout <= 86400))])
+      )
+    ])
+    error_message = "must be between 1 and 86400"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend_http_settings == null || alltrue([for item in v.backend_http_settings : (item.sni_name == null || (length(item.sni_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend_http_settings == null || alltrue([for item in v.backend_http_settings : (item.trusted_root_certificate_names == null || (alltrue([for x in item.trusted_root_certificate_names : length(x) > 0])))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend == null || alltrue([for item in v.backend : (item.host_name == null || (length(item.host_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.backend == null || alltrue([for item in v.backend : (item.timeout_in_seconds == null || (item.timeout_in_seconds >= 1 && item.timeout_in_seconds <= 86400))])
+      )
+    ])
+    error_message = "must be between 1 and 86400"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.http_listener == null || alltrue([for item in v.http_listener : (item.host_names == null || (alltrue([for x in item.host_names : length(x) > 0])))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.listener == null || alltrue([for item in v.listener : (item.host_names == null || (alltrue([for x in item.host_names : length(x) > 0])))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.private_link_configuration == null || alltrue([for item in v.private_link_configuration : (length(item.name) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.private_link_configuration == null || alltrue([for item in v.private_link_configuration : (alltrue([for item in item.ip_configuration : (length(item.name) > 0)]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.request_routing_rule == null || alltrue([for item in v.request_routing_rule : (item.redirect_configuration_name == null || (length(item.redirect_configuration_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.request_routing_rule == null || alltrue([for item in v.request_routing_rule : (item.rewrite_rule_set_name == null || (length(item.rewrite_rule_set_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.request_routing_rule == null || alltrue([for item in v.request_routing_rule : (item.priority == null || (item.priority >= 1 && item.priority <= 20000))])
+      )
+    ])
+    error_message = "must be between 1 and 20000"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.routing_rule == null || alltrue([for item in v.routing_rule : (item.priority >= 1 && item.priority <= 20000)])
+      )
+    ])
+    error_message = "must be between 1 and 20000"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.redirect_configuration == null || alltrue([for item in v.redirect_configuration : (length(item.name) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.redirect_configuration == null || alltrue([for item in v.redirect_configuration : (item.target_listener_name == null || (length(item.target_listener_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.redirect_configuration == null || alltrue([for item in v.redirect_configuration : (item.target_url == null || (length(item.target_url) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.autoscale_configuration == null || (v.autoscale_configuration.min_capacity >= 0 && v.autoscale_configuration.min_capacity <= 100)
+      )
+    ])
+    error_message = "must be between 0 and 100"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.autoscale_configuration == null || (v.autoscale_configuration.max_capacity == null || (v.autoscale_configuration.max_capacity >= 2 && v.autoscale_configuration.max_capacity <= 125))
+      )
+    ])
+    error_message = "must be between 2 and 125"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.authentication_certificate == null || alltrue([for item in v.authentication_certificate : (length(item.name) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.authentication_certificate == null || alltrue([for item in v.authentication_certificate : (length(item.data) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.trusted_root_certificate == null || alltrue([for item in v.trusted_root_certificate : (length(item.name) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.trusted_root_certificate == null || alltrue([for item in v.trusted_root_certificate : (item.data == null || (length(item.data) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.probe == null || alltrue([for item in v.probe : (item.interval >= 1 && item.interval <= 86400)])
+      )
+    ])
+    error_message = "must be between 1 and 86400"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.probe == null || alltrue([for item in v.probe : (item.timeout >= 1 && item.timeout <= 86400)])
+      )
+    ])
+    error_message = "must be between 1 and 86400"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.probe == null || alltrue([for item in v.probe : (item.unhealthy_threshold >= 1 && item.unhealthy_threshold <= 20)])
+      )
+    ])
+    error_message = "must be between 1 and 20"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.probe == null || alltrue([for item in v.probe : (item.host == null || (length(item.host) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.probe == null || alltrue([for item in v.probe : (item.path == null || (anytrue([for p in ["/"] : startswith(item.path, p)])))])
+      )
+    ])
+    error_message = "must start with one of the allowed prefixes"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.rewrite_rule_set == null || alltrue([for item in v.rewrite_rule_set : (length(item.name) > 0)])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.rewrite_rule_set == null || alltrue([for item in v.rewrite_rule_set : (item.rewrite_rule == null || alltrue([for item in item.rewrite_rule : (length(item.name) > 0)]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.rewrite_rule_set == null || alltrue([for item in v.rewrite_rule_set : (item.rewrite_rule == null || alltrue([for item in item.rewrite_rule : (item.rule_sequence >= 1 && item.rule_sequence <= 1000)]))])
+      )
+    ])
+    error_message = "must be between 1 and 1000"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.rewrite_rule_set == null || alltrue([for item in v.rewrite_rule_set : (item.rewrite_rule == null || alltrue([for item in item.rewrite_rule : (item.url == null || (item.url.components == null || (contains(["path_only", "query_string_only"], item.url.components))))]))])
+      )
+    ])
+    error_message = "must be one of: path_only, query_string_only"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.ssl_certificate == null || alltrue([for item in v.ssl_certificate : (item.data == null || (can(base64decode(item.data))))])
+      )
+    ])
+    error_message = "must be valid base64"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.ssl_profile == null || alltrue([for item in v.ssl_profile : (item.trusted_client_certificate_names == null || (alltrue([for x in item.trusted_client_certificate_names : length(x) > 0])))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.url_path_map == null || alltrue([for item in v.url_path_map : (item.default_redirect_configuration_name == null || (length(item.default_redirect_configuration_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.url_path_map == null || alltrue([for item in v.url_path_map : (item.default_rewrite_rule_set_name == null || (length(item.default_rewrite_rule_set_name) > 0))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.url_path_map == null || alltrue([for item in v.url_path_map : (alltrue([for item in item.path_rule : (item.redirect_configuration_name == null || (length(item.redirect_configuration_name) > 0))]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.url_path_map == null || alltrue([for item in v.url_path_map : (alltrue([for item in item.path_rule : (item.rewrite_rule_set_name == null || (length(item.rewrite_rule_set_name) > 0))]))])
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.waf_configuration == null || (v.waf_configuration.file_upload_limit_mb == null || (v.waf_configuration.file_upload_limit_mb >= 1 && v.waf_configuration.file_upload_limit_mb <= 750))
+      )
+    ])
+    error_message = "must be between 1 and 750"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.waf_configuration == null || (v.waf_configuration.max_request_body_size_kb == null || (v.waf_configuration.max_request_body_size_kb >= 1 && v.waf_configuration.max_request_body_size_kb <= 128))
+      )
+    ])
+    error_message = "must be between 1 and 128"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.waf_configuration == null || (v.waf_configuration.disabled_rule_group == null || alltrue([for item in v.waf_configuration.disabled_rule_group : (item.rules == null || (alltrue([for x in item.rules : x >= 1])))]))
+      )
+    ])
+    error_message = "must be at least 1"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.waf_configuration == null || (v.waf_configuration.exclusion == null || alltrue([for item in v.waf_configuration.exclusion : (item.selector == null || (length(item.selector) > 0))]))
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        v.tags == null || (length(v.tags) <= 50)
+      )
+    ])
+    error_message = "[from tags.Validate: invalid when len(value) > 50]"
+  }
+  # Note: 84 additional provider-side validators are enforced at apply time but not mirrored as validation{} blocks here (bespoke or non-mechanically-translatable).
 }
 
