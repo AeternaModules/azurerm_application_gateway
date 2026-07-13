@@ -248,7 +248,7 @@ EOT
     frontend_ip_configuration = list(object({
       name                            = string
       private_ip_address              = optional(string)
-      private_ip_address_allocation   = optional(string) # Default: "Dynamic"
+      private_ip_address_allocation   = optional(string)
       private_link_configuration_name = optional(string)
       public_ip_address_id            = optional(string)
       subnet_id                       = optional(string)
@@ -313,8 +313,8 @@ EOT
       name = string
       rewrite_rule = optional(list(object({
         condition = optional(list(object({
-          ignore_case = optional(bool) # Default: false
-          negate      = optional(bool) # Default: false
+          ignore_case = optional(bool)
+          negate      = optional(bool)
           pattern     = string
           variable    = string
         })))
@@ -332,7 +332,7 @@ EOT
           components   = optional(string)
           path         = optional(string)
           query_string = optional(string)
-          reroute      = optional(bool) # Default: false
+          reroute      = optional(bool)
         }))
       })))
     })))
@@ -348,8 +348,8 @@ EOT
       url_path_map_name           = optional(string)
     })))
     redirect_configuration = optional(list(object({
-      include_path         = optional(bool) # Default: false
-      include_query_string = optional(bool) # Default: false
+      include_path         = optional(bool)
+      include_query_string = optional(bool)
       name                 = string
       redirect_type        = string
       target_listener_name = optional(string)
@@ -362,13 +362,13 @@ EOT
         body        = optional(string)
         status_code = list(string)
       }))
-      minimum_servers                           = optional(number) # Default: 0
+      minimum_servers                           = optional(number)
       name                                      = string
       path                                      = optional(string)
-      pick_host_name_from_backend_http_settings = optional(bool) # Default: false
+      pick_host_name_from_backend_http_settings = optional(bool)
       port                                      = optional(number)
       protocol                                  = string
-      proxy_protocol_header_enabled             = optional(bool) # Default: false
+      proxy_protocol_header_enabled             = optional(bool)
       timeout                                   = number
       unhealthy_threshold                       = number
     })))
@@ -430,33 +430,33 @@ EOT
       authentication_certificate = optional(list(object({
         name = string
       })))
-      certificate_chain_validation_enabled = optional(bool) # Default: true
+      certificate_chain_validation_enabled = optional(bool)
       connection_draining = optional(object({
         drain_timeout_sec = number
         enabled           = bool
       }))
       cookie_based_affinity                = string
-      dedicated_backend_connection_enabled = optional(bool) # Default: false
+      dedicated_backend_connection_enabled = optional(bool)
       host_name                            = optional(string)
       name                                 = string
       path                                 = optional(string)
-      pick_host_name_from_backend_address  = optional(bool) # Default: false
+      pick_host_name_from_backend_address  = optional(bool)
       port                                 = number
       probe_name                           = optional(string)
       protocol                             = string
-      request_timeout                      = optional(number) # Default: 30
+      request_timeout                      = optional(number)
       sni_name                             = optional(string)
-      sni_validation_enabled               = optional(bool) # Default: true
+      sni_validation_enabled               = optional(bool)
       trusted_root_certificate_names       = optional(list(string))
     })))
     backend = optional(list(object({
-      client_ip_preservation_enabled = optional(bool) # Default: false
+      client_ip_preservation_enabled = optional(bool)
       host_name                      = optional(string)
       name                           = string
       port                           = number
       probe_name                     = optional(string)
       protocol                       = string
-      timeout_in_seconds             = optional(number) # Default: 30
+      timeout_in_seconds             = optional(number)
       trusted_root_certificate_names = optional(list(string))
     })))
     autoscale_configuration = optional(object({
@@ -488,14 +488,22 @@ EOT
         selector                = optional(string)
         selector_match_operator = optional(string)
       })))
-      file_upload_limit_mb     = optional(number) # Default: 100
+      file_upload_limit_mb     = optional(number)
       firewall_mode            = string
-      max_request_body_size_kb = optional(number) # Default: 128
-      request_body_check       = optional(bool)   # Default: true
-      rule_set_type            = optional(string) # Default: "OWASP"
+      max_request_body_size_kb = optional(number)
+      request_body_check       = optional(bool)
+      rule_set_type            = optional(string)
       rule_set_version         = string
     }))
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.application_gateways : (
+        length(v.backend_address_pool) >= 1
+      )
+    ])
+    error_message = "Each backend_address_pool list must contain at least 1 items"
+  }
   validation {
     condition = alltrue([
       for k, v in var.application_gateways : (
@@ -507,18 +515,18 @@ EOT
   validation {
     condition = alltrue([
       for k, v in var.application_gateways : (
-        length(v.gateway_ip_configuration) <= 2
+        length(v.frontend_port) >= 1
       )
     ])
-    error_message = "Each gateway_ip_configuration list must contain at most 2 items"
+    error_message = "Each frontend_port list must contain at least 1 items"
   }
   validation {
     condition = alltrue([
       for k, v in var.application_gateways : (
-        v.backend_http_settings == null || (length(v.backend_http_settings) >= 1)
+        length(v.gateway_ip_configuration) >= 1 && length(v.gateway_ip_configuration) <= 2
       )
     ])
-    error_message = "Each backend_http_settings list must contain at least 1 items"
+    error_message = "Each gateway_ip_configuration list must contain between 1 and 2 items"
   }
   validation {
     condition = alltrue([
@@ -531,10 +539,10 @@ EOT
   validation {
     condition = alltrue([
       for k, v in var.application_gateways : (
-        v.request_routing_rule == null || (length(v.request_routing_rule) >= 1)
+        v.url_path_map == null || alltrue([for item in v.url_path_map : (length(item.path_rule) >= 1)])
       )
     ])
-    error_message = "Each request_routing_rule list must contain at least 1 items"
+    error_message = "Each path_rule list must contain at least 1 items"
   }
   # --- Unconfirmed validation candidates, derived from azurerm_application_gateway's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
@@ -742,6 +750,14 @@ EOT
   #   source:    [from keyvault.ValidateNestedItemID] !ok
   # path: trusted_root_certificate.key_vault_secret_id
   #   source:    [from keyvault.ValidateNestedItemID] err != nil
+  # path: ssl_policy.disabled_protocols[*]
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ssl_policy.policy_type
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ssl_policy.cipher_suites[*]
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ssl_policy.min_protocol_version
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: probe.interval
   #   condition: value >= 1 && value <= 86400
   #   message:   must be between 1 and 86400
@@ -786,6 +802,14 @@ EOT
   #   condition: length(value) > 0
   #   message:   must not be empty
   # path: ssl_profile.verify_client_certificate_revocation
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ssl_profile.ssl_policy.disabled_protocols[*]
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ssl_profile.ssl_policy.policy_type
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ssl_profile.ssl_policy.cipher_suites[*]
+  #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: ssl_profile.ssl_policy.min_protocol_version
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: url_path_map.default_redirect_configuration_name
   #   condition: length(value) > 0
